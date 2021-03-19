@@ -2,7 +2,7 @@
 
 ### Creating a new user & password:
 ```bash
-docker run --rm --entrypoint htpasswd registry:2.7.0 -Bbn devops devops123 > auth/nginx.htpasswd
+docker run --rm --entrypoint htpasswd registry:2.7.0 -Bbn <user> <password> > auth/nginx.htpasswd
 ```
 ### Purge tags:
 
