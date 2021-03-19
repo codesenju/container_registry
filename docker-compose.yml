@@ -29,7 +29,7 @@ services:
     image: quiq/docker-registry-ui
     container_name: registry-ui
     volumes:
-      - ./config.yml:/opt/config.yml:ro
+      - ./ui_config/config.yml:/opt/config.yml:ro
       - ./auth/nginx.htpasswd:/run/secrets/registry_password_file
 #    ports:
 #      - 8000:8000
