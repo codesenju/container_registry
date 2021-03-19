@@ -1,0 +1,43 @@
+version: "3.0"
+services:
+  proxy:
+    image: "nginx:alpine"
+    container_name: proxy
+    ports:
+      - 5043:80
+    networks:
+      - mynet
+    volumes:
+     - ./auth:/etc/nginx/conf.d
+     - ./ui_conf/nginx.conf:/etc/nginx/nginx.conf:ro
+  registry:
+    image: registry:2.7.0
+    container_name: registry
+    volumes:
+      - data:/var/lib/registry
+      - ./auth/nginx.htpasswd:/auth/htpasswd
+    environment:
+      - "REGISTRY_AUTH=htpasswd"
+      - "REGISTRY_AUTH_HTPASSWD_REALM=Registry Realm"
+      - "REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd"
+      - "REGISTRY_STORAGE_DELETE_ENABLED=true"
+    ports:
+      - 5000:5000
+    networks:
+      - mynet
+  ui:
+    image: quiq/docker-registry-ui
+    container_name: registry-ui
+    volumes:
+      - ./config.yml:/opt/config.yml:ro
+      - ./auth/nginx.htpasswd:/run/secrets/registry_password_file
+#    ports:
+#      - 8000:8000
+    networks:
+      - mynet
+volumes:
+  data:
+    driver: local
+networks:
+  mynet:
+    driver: bridge
