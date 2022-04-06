@@ -1,0 +1,46 @@
+version: "3.0"
+services:
+  proxy:
+    build:
+      context: .
+      dockerfile: Dockerfile.openresty
+    container_name: proxy
+    ports:
+      - 5043:80
+    networks:
+      - keycloak_net
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./certs:/certs
+  registry:
+    image: registry:2.7.0
+    container_name: registry
+    volumes:
+      - data:/var/lib/registry
+      - ./auth/nginx.htpasswd:/auth/htpasswd
+    environment:
+      - "REGISTRY_AUTH=htpasswd"
+      - "REGISTRY_AUTH_HTPASSWD_REALM=Registry Realm"
+      - "REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd"
+      - "REGISTRY_STORAGE_DELETE_ENABLED=true"
+#    ports:
+#      - 5000:5000
+    networks:
+      - keycloak_net
+  ui:
+    image: quiq/docker-registry-ui
+    container_name: registry-ui
+    volumes:
+      - ./ui_config/config.yml:/opt/config.yml:ro
+      - ./auth/nginx.htpasswd:/run/secrets/registry_password_file
+#    ports:
+#      - 8000:8000
+    networks:
+      - keycloak_net
+volumes:
+  data:
+    driver: local
+networks:
+  keycloak_net:
+    external: true
+
