@@ -1,3 +1,8 @@
+-- Keycloak Prerequisites:
+-- -> create group named 'registry_admins' in keycloak
+-- -> create client role in registry client named 'admin' and assign the group mapping to client role 'admin'
+-- -> create user and add the user to 'registry_admin' group
+
 local opts = {
     redirect_uri_path = "/redirect_uri",
     accept_none_alg = true,
@@ -19,7 +24,8 @@ local opts = {
      ngx.say(err)
      ngx.exit(ngx.HTTP_FORBIDDEN)
   end
-    local restrict = false
+
+    -- Group bases access control - create group named 'registry_admins' in keycloak
     local i = 0
     if res.id_token.groups ~= nil then
         for key,value in ipairs(res.id_token.groups)
@@ -32,5 +38,20 @@ local opts = {
     -- if i is greater than 0 that means user is in group /registry_admins
     -- if i is zero that means user is not in group /registry_admins
     if i < 1 then
+        ngx.exit(ngx.HTTP_UNAUTHORIZED)
+    end
+
+    -- RBAC - create client role in registry client named 'admin' and assign user to that client role
+    local x = 0
+    if res.id_token.resource_access.registry.roles ~= nil then
+            for key,value in ipairs(res.id_token.resource_access.registry.roles)
+            do
+                if value == "admin" then
+                    x = x + 1
+                end
+            end
+    end
+
+    if x < 1 then
         ngx.exit(ngx.HTTP_UNAUTHORIZED)
     end
