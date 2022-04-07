@@ -1,7 +1,11 @@
 -- Keycloak Prerequisites:
 -- -> create group named 'registry_admins' in keycloak
 -- -> create client role in registry client named 'admin' and assign the group mapping to client role 'admin'
--- -> create user and add the user to 'registry_admin' group
+-- -> create user and add the user to 'registry_admins' group
+-- Create client mappers as follows:
+-- Name             Category        Type               
+-- groups           Token mapper    Group Membership
+-- client roles     Token mapper    User Client Role
 
 local opts = {
     redirect_uri_path = "/redirect_uri",

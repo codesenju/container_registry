@@ -14,3 +14,14 @@ docker exec -t registry-ui /opt/docker-registry-ui -purge-tags -dry-run
 ```bash
 docker-compose up -d
 ```
+
+
+## Keycloak Prerequisites:
+### - create group named 'registry_admins' in keycloak
+### - create client role in registry client named 'admin' and assign the group mapping to client role 'admin'
+### - create user and add the user to 'registry_admins' group
+### - Create client mappers as follows:
+| Name | Category |  Type |
+| --- | ----------- |---|
+| groups  |         Token mapper  |  Group Membership
+| client roles|     Token mapper  |  User Client Role
