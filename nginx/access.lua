@@ -30,32 +30,41 @@ local opts = {
   end
 
     -- Group bases access control - create group named 'registry_admins' in keycloak
-    local i = 0
-    if res.id_token.groups ~= nil then
-        for key,value in ipairs(res.id_token.groups)
-        do
-            if value == "/registry_admins" then
-                i = i + 1
-            end
-        end
-    end
+    --local i = 0
+    --if res.id_token.groups ~= nil then
+    --    for key,value in ipairs(res.id_token.groups)
+    --    do
+    --        if value == "/registry_admins" then
+    --            i = i + 1
+    --        end
+    --    end
+    --end
     -- if i is greater than 0 that means user is in group /registry_admins
     -- if i is zero that means user is not in group /registry_admins
-    if i < 1 then
-        ngx.exit(ngx.HTTP_UNAUTHORIZED)
-    end
+    -- if i < 1 then
+    --    ngx.exit(ngx.HTTP_UNAUTHORIZED)
+    -- end
 
-    -- RBAC - create client role in registry client named 'admin' and assign user to that client role
+     -- RBAC - create client role in registry client named 'admin' and assign user to that client role
+     -- Error handling
     local x = 0
-    if res.id_token.resource_access.registry.roles ~= nil then
-            for key,value in ipairs(res.id_token.resource_access.registry.roles)
-            do
-                if value == "admin" then
-                    x = x + 1
+    function checkRoles ()
+        if res.id_token.resource_access.registry.roles ~= nil then
+                for key,value in ipairs(res.id_token.resource_access.registry.roles)
+                do
+                    if value == "admin" then
+                        x = x + 1
+                    end
                 end
-            end
+        end
     end
-
-    if x < 1 then
-        ngx.exit(ngx.HTTP_UNAUTHORIZED)
+    -- Error handling
+    if pcall(checkRoles) then
+        -- no errors while running `checkRoles()'
+        if x < 1 then
+            ngx.redirect("/logout")
+        end
+    else
+        -- `checkRoles()' raised an error: take appropriate actions
+    ngx.redirect("/logout")
     end

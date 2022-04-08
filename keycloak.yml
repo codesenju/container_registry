@@ -12,6 +12,7 @@ services:
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
       - ./nginx/access.lua:/etc/nginx/conf.d/access.lua
+      - ./nginx/html/:/opt/nginx/html
   registry:
     image: registry:2.7.0
     container_name: registry
